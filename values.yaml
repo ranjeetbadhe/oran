@@ -1,0 +1,13 @@
+# Common values for every site. Per-site overrides: clusters/<managedcluster-name>/values.yaml
+replicaCount: 1
+image:
+  repository: registry.example.com/telco/myapp     # private registry
+  digest: ""                                        # REQUIRED: sha256:... (released image, pinned; shown in the portal)
+imagePullSecrets:
+  - name: private-registry                          # created on every telco site by RHACM policy myapp-pull-secret
+service:
+  port: 8080
+resources:
+  requests: {cpu: 50m, memory: 64Mi}
+  limits: {memory: 256Mi}
+site: {}                                            # per-site settings go in clusters/<name>/values.yaml
