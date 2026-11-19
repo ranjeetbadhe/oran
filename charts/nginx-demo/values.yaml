@@ -1,0 +1,9 @@
+replicaCount: 1
+image:
+  repository: docker.io/nginxinc/nginx-unprivileged
+  digest: sha256:02570a11e9bd4f37b3d9bff616130d83ee9e5d935dd83a8a2ddec420b67b1993
+imagePullSecrets:
+  - name: private-registry
+service:
+  port: 8080
+site: {}
