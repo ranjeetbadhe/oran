@@ -1,4 +1,0 @@
-# myapp overrides for site sno1 only (folder = ManagedCluster name, file = <app>.yaml). Optional: sites without it use
-# charts/myapp/values.yaml alone (ApplicationSet uses ignoreMissingValueFiles: true).
-site:
-  site_name: sno1
