@@ -1,0 +1,16 @@
+{{- if .Values.openshift.anyuidForNamespace }}
+# MySQL and the helper init containers expect their image's own user (OpenShift would assign a random UID).
+# The OAI network functions additionally get the privileged SCC from their own charts (kubernetesDistribution=Openshift).
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: oai-scc-anyuid
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: system:openshift:scc:anyuid
+subjects:
+  - apiGroup: rbac.authorization.k8s.io
+    kind: Group
+    name: system:serviceaccounts:{{ .Release.Namespace }}
+{{- end }}

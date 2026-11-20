@@ -1,0 +1,26 @@
+apiVersion: v2
+name: oai-5g-rfsim
+type: application
+icon: http://www.openairinterface.org/wp-content/uploads/2015/06/cropped-oai_final_logo.png
+version: 2.2.0-ocp.1
+description: OpenAirInterface 5G SA end-to-end (core + gNB + nrUE, RF simulator) for
+  OpenShift SNO, from the O-RAN portal
+appVersion: 2.2
+keywords:
+- 5GCN
+- AMF
+- SMF
+- NRF
+- UPF
+- UDM
+- UDR
+- AUSF
+- gNB
+- NRUE
+maintainers:
+- name: OPENAIRINTERFACE
+  email: oaicicdteam@openairinterface.org
+annotations:
+  app.oran/namespace: oai
+  app.oran/source: github.com/OPENAIRINTERFACE/orchestration e2e_scenarios/case1 @
+    7925f93

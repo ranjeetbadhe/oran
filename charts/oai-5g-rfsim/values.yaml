@@ -1,0 +1,322 @@
+# OpenAirInterface 5G SA in one namespace on an OpenShift SNO: MySQL, NRF, UDR, UDM, AUSF, AMF, SMF, UPF,
+# traffic server, gNB and nrUE with the RF simulator (no radio hardware). Source: OAI orchestration repo,
+# e2e_scenarios/case1 @ 7925f93, with kubernetesDistribution=Openshift. Deployed by Argo CD from the O-RAN portal.
+# Image versions are pinned to exact digests by publish-oai.sh ("<tag>@sha256:...") before publishing.
+# Per-site values: clusters/<site>/oai-5g-rfsim.yaml
+global:
+  kubernetesDistribution: Openshift
+  coreNetworkConfigMap: core
+  commonConfigMap: gnb
+  clusterIpServiceIpAllocation: false
+  waitForAMF: true
+  waitForRadio: true
+  waitForNRF: true
+  waitForUDR: true
+  http2Param: --http2-prior-knowledge
+  timeout: 1
+  imagePullSecrets:
+  - name: private-registry
+mysql:
+  enabled: true
+  imagePullPolicy: IfNotPresent
+  oai5gdatabase: basic
+  imagePullSecrets:
+  - name: private-registry
+  persistence:
+    enabled: false
+  image: docker.io/mysql
+  imageTag: "9.0.1@sha256:0cf8b60f74e235c4dd4beb762b10ec6da3dce30265f5f1d40c2c11fa7872ebd9"
+  busybox:
+    image: busybox
+    tag: "latest@sha256:f97baa533a26513c453a362be331a43eb60214302f449c16571b23cea141dce4"
+oai-nrf:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-nrf
+    version: "develop@sha256:a00121dff63a713b04c8798b942b6a7f1c963c41b948c1757ba3d345ab08728a"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+    storageClass: '-'
+    size: 1Gi
+  start:
+    nrf: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+oai-udr:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-udr
+    version: "develop@sha256:7dad7d446458e91de6f51d6975bb6b42478777a3aed4b481e510c135118c64fc"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+  start:
+    udr: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+oai-udm:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-udm
+    version: "develop@sha256:8742af4abf381b230de17ba9de7f5e2640a615c4bbcc99a40318df0787dbd15f"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+  start:
+    udm: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+oai-ausf:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-ausf
+    version: "develop@sha256:386797dc62559acd6f561344ea05667f6dd3745199381164e0e9eae3907f2cd5"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+  start:
+    ausf: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+oai-amf:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-amf
+    version: "develop@sha256:2bdf8956c7edab663fc68104b2587a2402d36ea56e5361b5ff0bfe7db5d7caea"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+  start:
+    amf: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+  multus:
+    enabled: false
+    interfaces:
+    - name: n2
+      hostInterface: eth0
+      ipAdd: 172.21.6.90
+      netmask: '22'
+      routes: ''
+      defaultRoute: 172.21.7.254
+      enabled: true
+    - name: sbi
+      hostInterface: eth0
+      ipAdd: 172.21.8.91
+      netmask: '22'
+      gateway: 172.21.11.254
+      enabled: true
+oai-upf:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-upf
+    version: "develop@sha256:a3f7c4cd814168f4f1b64d039838d031e224a2ab9fff63f25a942ce1b8b748ac"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+  start:
+    upf: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+  multus:
+    enabled: false
+    interfaces:
+    - name: n3
+      hostInterface: eth0
+      ipAdd: 172.21.12.95
+      netmask: '22'
+      defaultRoute: 172.21.7.254
+      enabled: true
+    - name: n4
+      hostInterface: eth0
+      ipAdd: 192.168.24.2
+      netmask: '24'
+      enabled: true
+    - name: n6
+      hostInterface: eth0
+      ipAdd: 192.168.22.2
+      netmask: '24'
+      enabled: true
+    - name: n9
+      hostInterface: eth0
+      ipAdd: 192.168.23.2
+      netmask: '24'
+      enabled: false
+    - name: sbi
+      hostInterface: eth0
+      ipAdd: 172.21.8.91
+      netmask: '22'
+      gateway: 172.21.11.254
+      enabled: true
+oai-traffic-server:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/trf-gen-cn5g
+    version: "latest@sha256:f1d596c47de4571bf6fb88f738f01b801f58cf0a257c52e8e11e93b62d069f50"
+    pullPolicy: IfNotPresent
+  imagePullSecrets:
+  - name: private-registry
+  multus:
+    enabled: false
+    interfaces:
+    - name: external
+      hostInterface: eth0
+      ipAdd: 172.21.6.99
+      netmask: '22'
+      defaultRoute: 172.21.7.254
+      enabled: true
+  config:
+    ueroute: 12.1.1.0/24
+    upfHost: oai-upf
+    noOfIperf3Server: 2
+  resources:
+    define: false
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  nodeSelector: {}
+  nodeName: ''
+oai-smf:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-smf
+    version: "develop@sha256:ea9b50d4c6fc6f4d2b6190a852c37edeb42460297bc530edff43e423a0739c56"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: false
+  persistent:
+    sharedvolume: false
+  start:
+    smf: true
+    tcpdump: false
+  imagePullSecrets:
+  - name: private-registry
+  nodeSelector: {}
+  multus:
+    enabled: false
+    interfaces:
+    - name: n4
+      hostInterface: eth0
+      ipAdd: 192.168.24.3
+      netmask: '24'
+      defaultRoute: ''
+      enabled: true
+    - name: sbi
+      hostInterface: eth0
+      ipAdd: 172.21.8.92
+      netmask: '22'
+      gateway: 172.21.11.254
+      enabled: true
+oai-gnb:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-gnb
+    version: "develop@sha256:cb9433d924fabd7ec4d08b4bb54705aa2fa62aaf495c01cfb0a9b42cd77205fd"
+    pullPolicy: IfNotPresent
+  includeTcpDumpContainer: true
+  imagePullSecrets:
+  - name: private-registry
+  multus:
+    enabled: false
+    interfaces:
+    - name: n2
+      hostInterface: eth0
+      ipAdd: 172.21.6.90
+      netmask: '22'
+      defaultRoute: 172.21.7.254
+      enabled: true
+    - name: n3
+      hostInterface: eth0
+      ipAdd: 172.21.8.91
+      netmask: '22'
+      gateway: 172.21.11.254
+      enabled: true
+    - name: ru
+      hostInterface: eth0
+      ipAdd: 192.168.80.90
+      netmask: '24'
+      gateway: 192.168.80.1
+      enabled: true
+      mtu: 1500
+  config:
+    timeZone: Europe/Paris
+    useAdditionalOptions: -E --rfsim --log_config.global_log_options level,nocolor,time
+    gnbName: oai-gnb
+    gdbstack: '0'
+    usrp: rfsim
+    amfHost: oai-amf
+    tac: 1
+    plmn_list:
+    - mcc: 1
+      mnc: 1
+      mnc_length: 2
+      snssaiList:
+      - sst: '1'
+        sd: '0xffffff'
+  resources:
+    define: false
+    limits:
+      nf:
+        cpu: 2000m
+        memory: 2Gi
+    requests:
+      nf:
+        cpu: 2000m
+        memory: 2Gi
+  nodeSelector: {}
+  nodeName: ''
+oai-nr-ue:
+  enabled: true
+  nfimage:
+    repository: docker.io/oaisoftwarealliance/oai-nr-ue
+    version: "develop@sha256:3e0253a116196c4cf217f28be654d68e54f4178e83a551d0fc162a4e2f4bc84b"
+    pullPolicy: IfNotPresent
+  imagePullSecrets:
+  - name: private-registry
+  config:
+    timeZone: Europe/Paris
+    rfSimServer: oai-ran
+    fullImsi: '001010000000100'
+    fullKey: fec86ba6eb707ed08905757b1bb44b8f
+    opc: C42449363BBAD02B66D16BC975D77CC1
+    gdbstack: 1
+    dnn: oai
+    sst: '1'
+    sd: '16777215'
+    usrp: rfsim
+    useAdditionalOptions: -E --rfsim -r 106 --numerology 1 -C 3319680000 --log_config.global_log_options level,nocolor,time
+  resources:
+    define: false
+    limits:
+      nf:
+        cpu: 2000m
+        memory: 2Gi
+    requests:
+      nf:
+        cpu: 2000m
+        memory: 2Gi
+  nodeSelector: {}
+  nodeName: ''
+openshift:
+  anyuidForNamespace: true

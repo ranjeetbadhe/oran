@@ -1,0 +1,4 @@
+# OAI 5G rfsim settings for sno1 only (example: a different gNB name)
+oai-gnb:
+  config:
+    gnbName: "gnb-sno1"
