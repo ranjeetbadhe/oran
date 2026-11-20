@@ -199,6 +199,8 @@ oai-traffic-server:
   nodeSelector: {}
   nodeName: ''
 oai-smf:
+  config:
+    imsHost: "192.168.70.139"
   enabled: true
   nfimage:
     repository: docker.io/oaisoftwarealliance/oai-smf
