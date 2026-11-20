@@ -347,7 +347,7 @@ oai-du:
         mtu: 1500
   config:
     timeZone: "Europe/Paris"
-    useAdditionalOptions: "-E --rfsim --log_config.global_log_options level,nocolor,time"
+    useAdditionalOptions: "-E --rfsim --rfsimulator.serveraddr server --log_config.global_log_options level,nocolor,time"
     duName: "oai-rfsim"
     usrp: "rfsim"  # Options: rfsim, b2xx, n3xx, x3xx
     cuHost: "oai-cu" ## Ip-address or hostname
