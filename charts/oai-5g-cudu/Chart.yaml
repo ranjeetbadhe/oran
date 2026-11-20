@@ -1,0 +1,14 @@
+apiVersion: v2
+name: oai-5g-cudu
+type: application
+icon: http://www.openairinterface.org/wp-content/uploads/2015/06/cropped-oai_final_logo.png
+version: 2.2.0-ocp.1
+description: OpenAirInterface 5G SA with CU/DU split over F1 (core + CU + DU + nrUE, RF simulator) for OpenShift SNO, from the O-RAN portal
+appVersion: 2.2
+keywords: [5GCN, AMF, SMF, NRF, UPF, UDM, UDR, AUSF, CU, DU, F1, NRUE]
+maintainers:
+- name: OPENAIRINTERFACE
+  email: oaicicdteam@openairinterface.org
+annotations:
+  app.oran/namespace: oai-cudu
+  app.oran/source: github.com/OPENAIRINTERFACE/orchestration e2e_scenarios/case2 @ 7925f93
